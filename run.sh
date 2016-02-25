@@ -30,7 +30,7 @@ PROCESS_NAME="$SERVICE_NAME-$KUBERNETES_NAMESPACE"
 if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
     echo "AWS credentials set, will upload heap dumps on OOM";
     HEAP_DUMP_ON_OOM="-XX:+HeapDumpOnOutOfMemoryError"
-    ON_OOM="aws s3 cp *.hprof s3://$S3_BUCKET/$SERVICE_NAME/`date "+%Y-%m-%dT%H:%M:%S"`/; kill -9 %p";
+    ON_OOM="aws s3 cp *.hprof s3://$S3_BUCKET/$PROCESS_NAME/`date "+%Y-%m-%dT%H:%M:%S"`/; kill -9 %p";
 else
     echo "AWS credentials NOT set, will not upload heap dumps on OOM"
     HEAP_DUMP_ON_OOM=""
