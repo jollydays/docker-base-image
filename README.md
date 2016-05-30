@@ -35,11 +35,11 @@ ENV AWS_ACCESS_KEY_ID XXX
 ENV AWS_SECRET_ACCESS_KEY XXX
 ENV AWS_DEFAULT_REGION XXX
 ENV S3_BUCKET memdumps
-```
 
 # Set the Environment Variables JOLOKIA_OFF or NEWRELIC_OFF to disable them
 ENV JOLOKIA_OFF
 ENV NEWRELIC_OFF
+```
 
 ## Credits:
 * https://developer.atlassian.com/blog/2015/08/minimal-java-docker-containers/
