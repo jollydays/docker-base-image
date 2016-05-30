@@ -14,16 +14,11 @@ _term() {
     exit $?
 }
 
-export JAVA_OPTIONS="$JAVA_OPTIONS $(jolokia_opts)"
+if [ -z ${NEWRELIC_OFF+x} ]; then
+   NEWRELIC_OPTS="-javaagent:/fabric8/newrelic.jar"
+fi
 
-echo "Starting Docker Image"
-echo "env SERVICE_NAME=$SERVICE_NAME"
-echo "env KUBERNETES_NAMESPACE=$KUBERNETES_NAMESPACE"
-echo "env MAIN=$MAIN"
-echo "env JAVA_HOME=$JAVA_HOME"
-echo "env JAVA_OPTIONS=$JAVA_OPTIONS"
-echo "env JAR=$JAR"
-echo "env CLASSPATH=$CLASSPATH"
+export JAVA_OPTIONS="$JAVA_OPTIONS $(jolokia_opts) $NEWRELIC_OPTS"
 
 PROCESS_NAME="$SERVICE_NAME-$KUBERNETES_NAMESPACE"
 
@@ -37,9 +32,19 @@ else
     ON_OOM="kill -9 %p"
 fi
 
+echo "Starting Docker Image"
+echo "env SERVICE_NAME=$SERVICE_NAME"
+echo "env KUBERNETES_NAMESPACE=$KUBERNETES_NAMESPACE"
+echo "env MAIN=$MAIN"
+echo "env JAVA_HOME=$JAVA_HOME"
+echo "env JAVA_OPTIONS=$JAVA_OPTIONS"
+echo "env JAR=$JAR"
+echo "env CLASSPATH=$CLASSPATH"
 echo "env ON_OOM=$ON_OOM"
 echo "env HEAP_DUMP_ON_OOM=$HEAP_DUMP_ON_OOM"
 echo "env PROCESS_NAME=$PROCESS_NAME"
+echo "env JOLOKIA_OFF=$JOLOKIA_OFF"
+echo "env NEWRELIC_OFF=$NEWRELIC_OFF"
 
 if [ "$$" -eq "1" ]
 then
@@ -50,11 +55,11 @@ then
     trap _term SIGTERM
     trap _ctrlc INT
     if [ -n "$MAIN" ]; then
-      echo java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
-      java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
+      echo java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
+      java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
     else
-      echo java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
-      java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
+      echo java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
+      java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
     fi
     exit 1
 else
@@ -63,10 +68,10 @@ else
     # Java will be able to auto-kill itself so we don't need to
     # do anything :)
     if [ -n "$MAIN" ]; then
-      echo $JAVA_HOME/bin/java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
-      exec $JAVA_HOME/bin/java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
+      echo $JAVA_HOME/bin/java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
+      exec $JAVA_HOME/bin/java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -cp $CLASSPATH $MAIN $ARGUMENTS
     else
-      echo $JAVA_HOME/bin/java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
-      exec $JAVA_HOME/bin/java -javaagent:/fabric8/newrelic.jar $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
+      echo $JAVA_HOME/bin/java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
+      exec $JAVA_HOME/bin/java $HEAP_DUMP_ON_OOM -XX:OnOutOfMemoryError="$ON_OOM" -Dnewrelic.config.app_name=$PROCESS_NAME $JAVA_OPTIONS -jar "/maven/$JAR" $ARGUMENTS
     fi
 fi
