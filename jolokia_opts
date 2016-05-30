@@ -1,6 +1,6 @@
 #!/bin/bash
 dir=${JOLOKIA_DIR:-/opt/jolokia}
-if [ -z ${JOLOKIA_OFF+x} ]; then
+if [ -z ${JOLOKIA_OFF+x} -o "$JOLOKIA_OFF" != "true" ]; then
    opts="-javaagent:$dir/jolokia.jar"
    config=${JOLOKIA_CONFIG:-$dir/jolokia.properties}
    if [ -f "$JOLOKIA_CONFIG" ]; then

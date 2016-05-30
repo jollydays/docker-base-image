@@ -36,9 +36,9 @@ ENV AWS_SECRET_ACCESS_KEY XXX
 ENV AWS_DEFAULT_REGION XXX
 ENV S3_BUCKET memdumps
 
-# Set the Environment Variables JOLOKIA_OFF or NEWRELIC_OFF to disable them
-ENV JOLOKIA_OFF
-ENV NEWRELIC_OFF
+# Set the Environment Variables JOLOKIA_OFF or NEWRELIC_OFF to 'true' to disable them
+ENV JOLOKIA_OFF true
+ENV NEWRELIC_OFF true
 ```
 
 ## Credits:

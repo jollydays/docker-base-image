@@ -14,7 +14,7 @@ _term() {
     exit $?
 }
 
-if [ -z ${NEWRELIC_OFF+x} ]; then
+if [ -z ${NEWRELIC_OFF+x} -o "$NEWRELIC_OFF" != "true" ]; then
    NEWRELIC_OPTS="-javaagent:/fabric8/newrelic.jar"
 fi
 
