@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.4
 
 MAINTAINER stefan.unterhofer@jollydays.com
 
@@ -34,9 +34,12 @@ RUN mkdir /maven
 EXPOSE 8778
 run mkdir /fabric8
 
+# Add NewRelic
+ENV NR_VERSION=3.31.0
+RUN curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/$NR_VERSION/newrelic-agent-$NR_VERSION.jar > /fabric8/newrelic.jar &&\
+    curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/$NR_VERSION/newrelic.yml > /fabric8/newrelic.yml
+
 # add custom run script + newrelic
 ADD run.sh /fabric8/
-COPY newrelic.jar /fabric8/
-COPY newrelic.yml /fabric8/
 
 CMD [ "/fabric8/run.sh" ]
